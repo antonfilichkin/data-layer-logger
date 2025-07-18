@@ -82,6 +82,17 @@
                 <configuration>
                     <mainClass>com.example.DataLayerLogger</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>run-with-logging</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.example.DataLayerLoggerWithLogging</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

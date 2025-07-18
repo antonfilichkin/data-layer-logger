@@ -23,11 +23,30 @@ run_custom() {
     URL=$1
     WAIT_TIME=${2:-10}
     
-    echo "Running with custom settings:"
+    echo "Running with custom settings (JavaScript injection method):"
     echo "  URL: $URL"
     echo "  Wait time: $WAIT_TIME seconds"
     
     mvn exec:java -Dexec.args="$URL $WAIT_TIME"
+}
+
+# Function to run with LoggingPreferences method
+run_logging() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: $0 logging <URL> [wait_time_seconds]"
+        echo "Example: $0 logging https://developers.google.com 8"
+        exit 1
+    fi
+    
+    URL=$1
+    WAIT_TIME=${2:-10}
+    
+    echo "Running with LoggingPreferences method:"
+    echo "  URL: $URL"
+    echo "  Wait time: $WAIT_TIME seconds"
+    echo "  Method: Non-intrusive network monitoring"
+    
+    mvn exec:java@run-with-logging -Dexec.args="$URL $WAIT_TIME"
 }
 
 # Function to compile the project
@@ -51,6 +70,10 @@ case "${1:-default}" in
         shift
         run_custom "$@"
         ;;
+    "logging")
+        shift
+        run_logging "$@"
+        ;;
     "compile")
         compile
         ;;
@@ -61,18 +84,25 @@ case "${1:-default}" in
         echo "Usage: $0 [command] [options]"
         echo ""
         echo "Commands:"
-        echo "  default              Run with default settings (GTM homepage, 10 seconds)"
-        echo "  custom <URL> [time]  Run with custom URL and optional wait time"
+        echo "  default              Run with default settings (JavaScript injection, GTM homepage, 10 seconds)"
+        echo "  custom <URL> [time]  Run with custom URL using JavaScript injection method"
+        echo "  logging <URL> [time] Run with LoggingPreferences method (recommended for GTM monitoring)"
         echo "  compile              Compile the project"
         echo "  install              Install dependencies"
         echo "  help                 Show this help message"
         echo ""
         echo "Examples:"
-        echo "  $0                                    # Run with defaults"
-        echo "  $0 default                           # Same as above"
-        echo "  $0 custom https://example.com        # Monitor example.com for 10 seconds"
-        echo "  $0 custom https://example.com 30     # Monitor example.com for 30 seconds"
-        echo "  $0 install                           # Install dependencies first"
+        echo "  $0                                           # Run with defaults (JavaScript injection)"
+        echo "  $0 default                                  # Same as above"
+        echo "  $0 custom https://example.com               # Monitor example.com with injection method"
+        echo "  $0 custom https://example.com 30            # Monitor example.com for 30 seconds"
+        echo "  $0 logging https://developers.google.com    # Monitor with LoggingPreferences (recommended)"
+        echo "  $0 logging https://developers.google.com 15 # Monitor for 15 seconds with LoggingPreferences"
+        echo "  $0 install                                  # Install dependencies first"
+        echo ""
+        echo "Method Comparison:"
+        echo "  JavaScript Injection: Direct dataLayer access, modifies page JavaScript"
+        echo "  LoggingPreferences:   Network monitoring, non-intrusive, captures more events"
         ;;
     *)
         echo "Unknown command: $1"
